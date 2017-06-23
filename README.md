@@ -7,7 +7,7 @@ written with #Python !!!!!
 
 1.install pip
 
-2.install BeautifulSoup
+2.install beautifulsoup4
 
 3.install xlrd
 
