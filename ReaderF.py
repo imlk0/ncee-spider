@@ -39,7 +39,7 @@ class Reader(object):
         request = urllib2.Request(url,data)
         response = urllib2.urlopen(request)
         if response.getcode() == 200:
-            print "学号{0}成功连接".format(s_sid)
+            print "{0}号成功连接".format(s_sid)
             html_doc = response.read().decode('gbk').encode('utf-8')
             #print html_doc
             soup = BeautifulSoup(html_doc,'html.parser',from_encoding = 'utf-8')
@@ -48,7 +48,7 @@ class Reader(object):
             print ones
             
             if ones == []:
-                print "学号{0}考生号不存在".format(s_sid)
+                print "{0}号考生号不存在!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!".format(s_sid)
                 return None
             else:
                 nums = re.findall("\d+", ones[4].get_text())
@@ -57,7 +57,7 @@ class Reader(object):
 
         
         else:
-            print "学号{0}连接失败".format(s_sid)
+            print "{0}号连接失败".format(s_sid)
             return None
         
         
