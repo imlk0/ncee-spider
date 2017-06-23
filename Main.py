@@ -28,22 +28,44 @@ if __name__ == '__main__':
     print "成功打开了文件{0}".format(filename)
     sourceSheet = sourceExcel.sheet_by_index(0)
     print "成功打开了工作表"
+
+    studentNum = sourceSheet.nrows - 1
+    print studentNum, "students"
+
+    
+    '''
+
     
     firstID = ####### #首个考生号
     
     
     studentNum = ##  #班级人数
+
+
+
+
     IDs = range(firstID,firstID + studentNum)
+
+    '''
+    '''
+    IDs = []
     name = []
     sfzh = []
     count = 0
     while count < studentNum:
+        
         #print sourceSheet.cell_value(count + 1,0)
-        name.append(sourceSheet.cell_value(count + 1,0))
+        name.append(sourceSheet.cell_value(count + 1,0))#name
         #print sourceSheet.cell_value(count + 1,1)[14:18]
-        sfzh.append(sourceSheet.cell_value(count + 1,1)[14:18])#填充所有人按学号的身份证号
+        IDs.append(sourceSheet.cell_value(count + 1,1))#kaoshenghao
+
+        sfzh.append(sourceSheet.cell_value(count + 1,2)[14:18])#填充所有人按学号的身份证号
+
         count = count + 1
-    
+    '''
+
+
+
     aim_wb = xlwt.Workbook()
     
     aim_sh = aim_wb.add_sheet("Sheet1")
@@ -62,12 +84,30 @@ if __name__ == '__main__':
     Areader = Reader()
     count = 0
     while count < studentNum:
-        print str(IDs[count])[4:19]
-        nums = Areader.toDo( str(IDs[count])[4:19],sfzh[count],count + 1)
+        name = sourceSheet.cell_value(count + 1,0)
+        ID = sourceSheet.cell_value(count + 1,1)
+        sfzh = sourceSheet.cell_value(count + 1,2)
+
+        ID = str(int(ID))#change
+        sfzh = str(sfzh)
+
+
+        '''
+        #print str(IDs[count])[4:19]
+        print type(name)
+        print type(ID)
+        print type(sfzh)
+        '''
+
+
+        print count + 1, ": " ,name,ID,sfzh
+
+        nums = Areader.toDo( ID[4:19],sfzh[14:18],count + 1)
+
         if nums is not None:
             
             
-            aim_sh.write(count + 1, 0,name[count])
+            aim_sh.write(count + 1, 0,name)
             
             
             aim_sh.write(count + 1, 1,nums[2])
@@ -85,6 +125,9 @@ if __name__ == '__main__':
 
     aim_wb.save("aim{0}.xls".format(int(time.time())))
 #/storage/emulated/0/qpython/scripts/ScoreRecorder/com/HaHa/ScoreRecorder/
+
+
+
 def getScore(ID,sfzh,s_sid):
     Areader = Reader()
     dic = Areader.toDo(ID,sfzh,s_sid)
