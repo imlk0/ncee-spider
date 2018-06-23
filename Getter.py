@@ -11,6 +11,7 @@ import urllib
 import urllib2
 from bs4 import BeautifulSoup
 import re
+import time
 
 
 class Getter(threading.Thread):
@@ -61,8 +62,8 @@ class Getter(threading.Thread):
                 self.student.tryTime += 1
 
                 data = urllib.urlencode(self.values)
-                url = "http://gkcf.jxedu.gov.cn/cjcx/LqQuerySelvet"
-                # url = "http://gkcf.jxedu.gov.cn/cjcx/CjQuerySelvet"
+                # url = "http://gkcf.jxedu.gov.cn/cjcx/LqQuerySelvet"
+                url = "http://gkcf.jxedu.gov.cn/cjcx/CjQuerySelvet"
                 
                 req = urllib2.Request(url, data)
 
@@ -81,31 +82,30 @@ class Getter(threading.Thread):
                         
                         if ones == []:
                             self.student.flag = 1  # 无信息
-                            self.logUtil.mprint(1, u"[第{3}次尝试] {0} {1} {2} 无信息".format(self.student.studentName, self.student.studentID, self.student.studentSFZH,self.student.tryTime))
+                            self.logUtil.mprint(1, u"[第{3}次尝试] {0}\t{1} {2}\t无信息".format(self.student.studentName, self.student.studentID, self.student.studentSFZH,self.student.tryTime))
                         else:
                             self.resolveStudentInf(ones)
                             self.studentResolved = True
                             if self.student.tryTime != 1:
-                                self.logUtil.mprint(1, u"[第{3}次尝试] {0} {1} {2} 成功".format(self.student.studentName, self.student.studentID, self.student.studentSFZH,self.student.tryTime))
+                                self.logUtil.mprint(1, u"[第{3}次尝试] {0}\t{1} {2}\t成功".format(self.student.studentName, self.student.studentID, self.student.studentSFZH,self.student.tryTime))
 
 
                     else:
-                        print u"[第{3}次尝试] {0} {1} {2}连接失败(返回码{4})".format(self.student.studentName, self.student.studentID, self.student.studentSFZH,self.student.tryTime,resp.getcode())
+                        print u"[第{3}次尝试] {0}\t{1} {2}\t连接失败(返回码{4})".format(self.student.studentName, self.student.studentID, self.student.studentSFZH,self.student.tryTime,resp.getcode())
                         self.resultCode = -1  
                         
-                except IOError:
-                    self.logUtil.mprint(1, u"[第{3}次尝试] {0} {1} {2} 连接被服务器阻断".format(self.student.studentName, self.student.studentID, self.student.studentSFZH,self.student.tryTime))
-                    self.resultCode = -1
-                except urllib2.URLError:
-                    self.logUtil.mprint(1, u"[第{3}次尝试]{0} {1} {2} 连接失败".format(self.student.studentName, self.student.studentID, self.student.studentSFZH,self.student.tryTime))
+                except BaseException, e:
+                    self.logUtil.mprint(1, u"[第{3}次尝试] {0}\t{1} {2}\t连接失败 {4}".format(self.student.studentName, self.student.studentID, self.student.studentSFZH,self.student.tryTime,e))
                     self.resultCode = -1
                 finally:
                     if resp:
                         resp.close()
                     
 
-                if self.studentResolved or self.student.tryTime >= 5:
+                if self.studentResolved or self.student.tryTime >= 10:
                     self.flag = 2  # 完成一项任务
+                else:
+                    time.sleep(0.7)
                 
             if self.exit == 1 and (self.flag == 2 or self.flag == 0):
                 break
@@ -137,24 +137,45 @@ class Getter(threading.Thread):
         #     count = count + 1
 
         if u'考生姓名' in ones[4].get_text():
-            
-            self.student.ksh = re.findall("\d+", ones[15].get_text())[0]
-            self.student.zkzh = re.findall("\d+", ones[16].get_text())[0]
+            start = 15
+            self.student.ksh = re.findall("\d+", ones[start].get_text())[0]
+            start += 1
+            self.student.zkzh = re.findall("\d+", ones[start].get_text())[0]
+            start += 1
+            self.student.bkzf = re.findall("\d+", ones[start].get_text())[0]
+            start += 1
+            self.student.bkpm = re.findall("\d+", ones[start].get_text())[0]
+            start += 1
+            self.student.zkzf = re.findall("\d+", ones[start].get_text())[0]
+            start += 1
+            self.student.zkpm = re.findall("\d+", ones[start].get_text())[0]
+            start += 1
 
-            self.student.bkzf = re.findall("\d+", ones[17].get_text())[0]
-            self.student.bkpm = re.findall("\d+", ones[18].get_text())[0]
-            self.student.zkzf = re.findall("\d+", ones[19].get_text())[0]
-            self.student.zkpm = re.findall("\d+", ones[20].get_text())[0]
+            # self.student.ksh = re.findall("\d+", ones[15].get_text())[0]
+            # self.student.zkzh = re.findall("\d+", ones[16].get_text())[0]
+            # self.student.bkzf = re.findall("\d+", ones[17].get_text())[0]
+            # self.student.bkpm = re.findall("\d+", ones[18].get_text())[0]
+            # self.student.zkzf = re.findall("\d+", ones[19].get_text())[0]
+            # self.student.zkpm = re.findall("\d+", ones[20].get_text())[0]
                 
             if u'加 分' in ones[4].get_text():
-                self.student.jf = re.findall("\d+", ones[33].get_text())[0]
-                
+                # start = 15
                 self.student.yw = re.findall("\d+", ones[28].get_text())[0]
                 self.student.sx = re.findall("\d+", ones[29].get_text())[0]
                 self.student.yy = re.findall("\d+", ones[30].get_text())[0]
                 self.student.zh = re.findall("\d+", ones[31].get_text())[0]
                 self.student.js = re.findall("\d+", ones[32].get_text())[0]
                 
+                self.student.jf = re.findall("\d+", ones[33].get_text())[0]
+
+                # self.student.yw = re.findall("\d+", ones[28].get_text())[0]
+                # self.student.sx = re.findall("\d+", ones[29].get_text())[0]
+                # self.student.yy = re.findall("\d+", ones[30].get_text())[0]
+                # self.student.zh = re.findall("\d+", ones[31].get_text())[0]
+                # self.student.js = re.findall("\d+", ones[32].get_text())[0]
+                
+                # self.student.jf = re.findall("\d+", ones[33].get_text())[0]
+
             else:
                 self.student.jf = '0'
                 

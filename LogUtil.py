@@ -6,6 +6,7 @@ Created on 2017年9月16日
 @author: imlk
 '''
 
+import threading
 import sys
 
 
@@ -14,8 +15,13 @@ class LogUtil(object):
     def __init__(self):
         self.lastFlag = 1
         self.lastMsg = ''
+        self.lock=threading.Lock()
+
 
     def mprint(self, flag, msg):
+        
+        self.lock.acquire()
+        
         if flag == 1:
             if self.lastFlag == 1:
                 
@@ -41,4 +47,6 @@ class LogUtil(object):
                 
         self.lastMsg = msg
         self.lastFlag = flag
+
+        self.lock.release()
 
