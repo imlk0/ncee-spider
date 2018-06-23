@@ -27,39 +27,81 @@ class Writter(threading.Thread):
         self.aim_wb = xlwt.Workbook()
     
         self.aim_sh = self.aim_wb.add_sheet("Sheet1")
-        self.aim_sh.write(0, 0,u'学生序号')
-        self.aim_sh.write(0, 1,u'姓名')
-        self.aim_sh.write(0, 2,u'考生号')
-        self.aim_sh.write(0, 3,u'准考证号')
-        self.aim_sh.write(0, 4,u'本科总分(含加分)')
-        self.aim_sh.write(0, 5,u'本科排名')
-        self.aim_sh.write(0, 6,u'专科总分(含加分)')
-        self.aim_sh.write(0, 7,u'专科排名')
-        self.aim_sh.write(0, 8,u'语文')
-        self.aim_sh.write(0, 9,u'数学')
-        self.aim_sh.write(0, 10,u'外语')
-        self.aim_sh.write(0, 11,u'综合')
-        self.aim_sh.write(0, 12,u'技术')
-        self.aim_sh.write(0, 13,u'加分')
+        start = 0
+        self.aim_sh.write(0, start,u'学生序号')
+        start += 1
+        self.aim_sh.write(0, start,u'姓名')
+        start += 1
+
+        self.aim_sh.write(0, start,u'考生号/准考证号')
+        start += 1
+        self.aim_sh.write(0, start,u'身份证号码')
+        start += 1
+
+        self.aim_sh.write(0, start,u'考生号')
+        start += 1
+        self.aim_sh.write(0, start,u'准考证号')
+        start += 1
+
+        self.aim_sh.write(0, start,u'本科总分(含加分)')
+        start += 1
+        self.aim_sh.write(0, start,u'本科排名')
+        start += 1
+        self.aim_sh.write(0, start,u'专科总分(含加分)')
+        start += 1
+        self.aim_sh.write(0, start,u'专科排名')
+        start += 1
+        self.aim_sh.write(0, start,u'语文')
+        start += 1
+        self.aim_sh.write(0, start,u'数学')
+        start += 1
+        self.aim_sh.write(0, start,u'外语')
+        start += 1
+        self.aim_sh.write(0, start,u'综合')
+        start += 1
+        self.aim_sh.write(0, start,u'技术')
+        start += 1
+        self.aim_sh.write(0, start,u'加分')
+        start += 1
     
-        self.aim_sh.write(0, 15,u'录取状态')
-        self.aim_sh.write(0, 16,u'计划性质名称')
-        self.aim_sh.write(0, 17,u'录取专业')
-        self.aim_sh.write(0, 18,u'录取批次')
-        self.aim_sh.write(0, 19,u'录取科类')
-        self.aim_sh.write(0, 20,u'录取时间')
-        self.aim_sh.write(0, 21,u'院校代号(省标)')
-        self.aim_sh.write(0, 22,u'录取院校')
+        self.aim_sh.write(0, start,u'录取状态')
+        start += 1
+        self.aim_sh.write(0, start,u'计划性质名称')
+        start += 1
+        self.aim_sh.write(0, start,u'录取专业')
+        start += 1
+        self.aim_sh.write(0, start,u'录取批次')
+        start += 1
+        self.aim_sh.write(0, start,u'录取科类')
+        start += 1
+        self.aim_sh.write(0, start,u'录取时间')
+        start += 1
+        self.aim_sh.write(0, start,u'院校代号(省标)')
+        start += 1
+        self.aim_sh.write(0, start,u'录取院校')
+        start += 1
         
         self.error_wb = xlwt.Workbook()
         self.error_sh = self.error_wb.add_sheet("Sheet1")
-        self.error_sh.write(0, 0,u'学生序号')
-        self.error_sh.write(0, 1,u'姓名')
-        self.error_sh.write(0, 2,u'考生号/准考证号')
-        self.error_sh.write(0, 3,u'身份证号码')
+        start = 0
+        self.error_sh.write(0, start,u'学生序号')
+        start += 1
+        self.error_sh.write(0, start,u'姓名')
+        start += 1
+        self.error_sh.write(0, start,u'考生号/准考证号')
+        start += 1
+        self.error_sh.write(0, start,u'身份证号码')
+        start += 1
         
         self.errorStudentNum = 0
         
+
+        nowTime = int(time.time())
+        self.aim_path = "aim{0}.xls".format(nowTime)
+        self.error_path = "error{0}.xls".format(nowTime)
+        
+
+
     def addStudent(self,student):
         self.studentList.append(student)
         
@@ -70,60 +112,113 @@ class Writter(threading.Thread):
         
         if student.flag == -1:
             self.errorStudentNum = self.errorStudentNum + 1
+            start = 0
+            self.error_sh.write(self.errorStudentNum,start,student.studentNO)
+            start += 1
+            self.error_sh.write(self.errorStudentNum,start,student.studentName)
+            start += 1
+            self.error_sh.write(self.errorStudentNum,start,student.studentID)
+            start += 1
+            self.error_sh.write(self.errorStudentNum,start,student.studentSFZH)
+            start += 1
+            self.error_sh.write(self.errorStudentNum,start,u'连接失败')
+            start += 1
             
-            self.error_sh.write(self.errorStudentNum,0,student.studentNO)
-            self.error_sh.write(self.errorStudentNum,1,student.studentName)
-            self.error_sh.write(self.errorStudentNum,2,student.studentID)
-            self.error_sh.write(self.errorStudentNum,3,student.studentSFZH)
-            self.error_sh.write(self.errorStudentNum,4,u'连接失败')
-            
-            self.aim_sh.write(student.studentNO,0,student.studentNO)
-            self.aim_sh.write(student.studentNO,1,student.studentName)
-            self.aim_sh.write(student.studentNO,2,student.studentID)
-            self.aim_sh.write(student.studentNO,4,u'连接失败')
+            start = 0
+            self.aim_sh.write(student.studentNO,start,student.studentNO)
+            start += 1
+            self.aim_sh.write(student.studentNO,start,student.studentName)
+            start += 1
+            self.aim_sh.write(student.studentNO,start,student.studentID)
+            start += 1
+            self.aim_sh.write(student.studentNO,start,student.studentSFZH)
+
+            start += 3
+            self.aim_sh.write(student.studentNO,start,u'连接失败')
             
         elif student.flag == 1:
             self.errorStudentNum = self.errorStudentNum + 1
             
-            self.error_sh.write(self.errorStudentNum,0,student.studentNO)
-            self.error_sh.write(self.errorStudentNum,1,student.studentName)
-            self.error_sh.write(self.errorStudentNum,2,student.studentID)
-            self.error_sh.write(self.errorStudentNum,3,student.studentSFZH)
-            self.error_sh.write(self.errorStudentNum,4,u'无信息')
+            start = 0
+            self.error_sh.write(self.errorStudentNum,start,student.studentNO)
+            start += 1
+            self.error_sh.write(self.errorStudentNum,start,student.studentName)
+            start += 1
+            self.error_sh.write(self.errorStudentNum,start,student.studentID)
+            start += 1
+            self.error_sh.write(self.errorStudentNum,start,student.studentSFZH)
+            start += 1
+            self.error_sh.write(self.errorStudentNum,start,u'无信息')
+            start += 1
             
-            self.aim_sh.write(student.studentNO,0,student.studentNO)
-            self.aim_sh.write(student.studentNO,1,student.studentName)
-            self.aim_sh.write(student.studentNO,2,student.studentID)
-            self.aim_sh.write(student.studentNO,4,u'无信息')
+            start = 0
+            self.aim_sh.write(student.studentNO,start,student.studentNO)
+            start += 1
+            self.aim_sh.write(student.studentNO,start,student.studentName)
+            start += 1
+            self.aim_sh.write(student.studentNO,start,student.studentID)
+            start += 1
+            self.aim_sh.write(student.studentNO,start,student.studentSFZH)
+            start += 3
+            self.aim_sh.write(student.studentNO,start,u'无信息')
+            start += 1
             
         else:
-            self.aim_sh.write(student.studentNO,0,student.studentNO)
-            self.aim_sh.write(student.studentNO,1,student.studentName)
-            self.aim_sh.write(student.studentNO,2,student.ksh)
-            self.aim_sh.write(student.studentNO,3,student.zkzh)
-            self.aim_sh.write(student.studentNO,4,student.bkzf)
-            self.aim_sh.write(student.studentNO,5,student.bkpm)
-            self.aim_sh.write(student.studentNO,6,student.zkzf)
-            self.aim_sh.write(student.studentNO,7,student.zkpm)
-            self.aim_sh.write(student.studentNO,8,student.yw)
-            self.aim_sh.write(student.studentNO,9,student.sx)
-            self.aim_sh.write(student.studentNO,10,student.yy)
-            self.aim_sh.write(student.studentNO,11,student.zh)
-            self.aim_sh.write(student.studentNO,12,student.js)
-            self.aim_sh.write(student.studentNO,13,student.jf)
+            start = 0
+            self.aim_sh.write(student.studentNO,start,student.studentNO)
+            start += 1
+            self.aim_sh.write(student.studentNO,start,student.studentName)
+            start += 1
+            self.aim_sh.write(student.studentNO,start,student.studentID)
+            start += 1
+            self.aim_sh.write(student.studentNO,start,student.studentSFZH)
+            start += 1
+            self.aim_sh.write(student.studentNO,start,student.ksh)
+            start += 1
+            self.aim_sh.write(student.studentNO,start,student.zkzh)
+            start += 1
+            self.aim_sh.write(student.studentNO,start,student.bkzf)
+            start += 1
+            self.aim_sh.write(student.studentNO,start,student.bkpm)
+            start += 1
+            self.aim_sh.write(student.studentNO,start,student.zkzf)
+            start += 1
+            self.aim_sh.write(student.studentNO,start,student.zkpm)
+            start += 1
+            self.aim_sh.write(student.studentNO,start,student.yw)
+            start += 1
+            self.aim_sh.write(student.studentNO,start,student.sx)
+            start += 1
+            self.aim_sh.write(student.studentNO,start,student.yy)
+            start += 1
+            self.aim_sh.write(student.studentNO,start,student.zh)
+            start += 1
+            self.aim_sh.write(student.studentNO,start,student.js)
+            start += 1
+            self.aim_sh.write(student.studentNO,start,student.jf)
+            start += 1
 
             
             if student.flag == 2:
-                self.aim_sh.write(student.studentNO,14,u'未查询到录取信息')
+                self.aim_sh.write(student.studentNO,16,u'未查询到录取信息')
             elif student.flag == 3:
-                self.aim_sh.write(student.studentNO,15,student.lqzt)
-                self.aim_sh.write(student.studentNO,16,student.jhxzmc)
-                self.aim_sh.write(student.studentNO,17,student.lqzy)
-                self.aim_sh.write(student.studentNO,18,student.lqpc)
-                self.aim_sh.write(student.studentNO,19,student.lqkl)
-                self.aim_sh.write(student.studentNO,20,student.lqsj)
-                self.aim_sh.write(student.studentNO,21,student.yxdh)
-                self.aim_sh.write(student.studentNO,22,student.lqyx)
+                start = 17
+                self.aim_sh.write(student.studentNO,start,student.lqzt)
+                start += 1
+                self.aim_sh.write(student.studentNO,start,student.jhxzmc)
+                start += 1
+                self.aim_sh.write(student.studentNO,start,student.lqzy)
+                start += 1
+                self.aim_sh.write(student.studentNO,start,student.lqpc)
+                start += 1
+                self.aim_sh.write(student.studentNO,start,student.lqkl)
+                start += 1
+                self.aim_sh.write(student.studentNO,start,student.lqsj)
+                start += 1
+                self.aim_sh.write(student.studentNO,start,student.yxdh)
+                start += 1
+                self.aim_sh.write(student.studentNO,start,student.lqyx)
+                start += 1
         
         
         self.writtenStudentNum = self.writtenStudentNum + 1
@@ -135,15 +230,16 @@ class Writter(threading.Thread):
                 student = self.studentList[0]
                 self.writeStudent(student)
                 self.studentList.remove(student)
+                self.aim_wb.save(self.aim_path)
+                self.error_wb.save(self.error_path)
+                
         if self.flag == 0 and self.studentList != []:
             for student in self.studentList:
                 self.writeStudent(student)
+                self.aim_wb.save(self.aim_path)
+                self.error_wb.save(self.error_path)
                 
         
-        
-        nowTime = int(time.time())
-        self.aim_path = "aim{0}.xls".format(nowTime)
-        self.error_path = "error{0}.xls".format(nowTime)
         
         self.aim_wb.save(self.aim_path)
         self.error_wb.save(self.error_path)

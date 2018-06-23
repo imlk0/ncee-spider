@@ -12,11 +12,11 @@ from LogUtil import LogUtil
 
 if __name__ == "__main__":
     
-    THREAD_NUM_MAX = 50
+    THREAD_NUM_MAX = 30
     
     logUtil = LogUtil()
     
-    studentFactory = StudentFactory('book1.xls', startRow=1, nameColumn=0, idColumn=1, sfzhColumn=2)
+    studentFactory = StudentFactory('book5.xls', startRow=1, nameColumn=0, idColumn=1, sfzhColumn=2)
     if studentFactory.studentNum == 0: #
         exit()
     getterList = [Getter(i, logUtil) for i in range(studentFactory.studentNum if studentFactory.studentNum < THREAD_NUM_MAX else THREAD_NUM_MAX)]
