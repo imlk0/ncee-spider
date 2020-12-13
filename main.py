@@ -22,7 +22,7 @@ parser = argparse.ArgumentParser(description='Program to get NCEE score.',
                                  formatter_class=argparse.RawTextHelpFormatter)
 
 parser.add_argument('mode', action="store", choices=[
-                    'i', 'e', 's', 'f'], help='choose import or export', type=str)
+                    'i', 'e', 's', 'f'], help='sub_command. \ni: import student info\ne: export score data\ns: print statistic info\nf: fetch student score from website', type=str)
 parser.add_argument('-f', action="store", dest='src_file', type=str, required=False,
                     help='student info from excel file')
 parser.add_argument('-o', action="store", dest='output_file', type=str, required=False,
