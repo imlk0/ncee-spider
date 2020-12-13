@@ -5,3 +5,4 @@ baidu-ocr:
   secret_key: 'xxxxxx'
 spider:
   max_retry: 5
+  use_offline_model: true

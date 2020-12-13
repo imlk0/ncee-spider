@@ -6,11 +6,17 @@ import lzstring
 from aip import AipOcr
 
 base_url = 'http://gkcf.jxedu.gov.cn/'
+# base_url = 'http://127.0.0.1:8080/'
 
 headers = {
-    'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
-    'Accept-Language': 'zh-CN,zh;q=0.8,en-US;q=0.5,en;q=0.3',
-    'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101 Firefox/78.0'
+    'Referer': base_url,
+    'Accept-Encoding': 'deflate, gzip, zstd',
+    'Pragma': 'no-cache',
+    'Cache-Control': 'no-cache',
+    'Accept': 'application/json, text/javascript, */*; q=0.01',
+    'X-Requested-With': 'XMLHttpRequest',
+    'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.88 Safari/537.36',
+    'Accept-Language': 'zh-CN,zh;q=0.9,en-US;q=0.8,en;q=0.7,ja-JP;q=0.6,ja;q=0.5,zh-TW;q=0.4',
 }
 
 lz = lzstring.LZString()
@@ -20,8 +26,15 @@ lz = lzstring.LZString()
 
 def get_captcha():
     img = None
-    url = base_url + 'captcha/getcode?t={}'.format(int(round(time.time() * 1000)))
-    response = requests.get(url, headers=headers)
+    url = base_url + \
+        'captcha/getcode?t={}'.format(int(round(time.time() * 1000)))
+    while True:
+        try:
+            response = requests.get(url, headers=headers, timeout=1)
+            break
+        except requests.exceptions.Timeout:
+            print("request timeout, retry now")
+            pass
     logging.debug(">>> {}".format(response))
     js = response.json()
     cookie = response.cookies['_cap_id']
@@ -37,7 +50,14 @@ def query_student(key1, key2, key3, cookie):
     payload = {"key1": key1,
                "key2": key2,
                "key3": key3}
-    response = requests.post(base_url, headers=headers, data=payload, cookies={'_cap_id': cookie})
+    while True:
+        try:
+            response = requests.post(base_url, headers=headers,
+                                     data=payload, cookies={'_cap_id': cookie}, timeout=1)
+            break
+        except requests.exceptions.Timeout:
+            print("request timeout, retry now")
+            pass
     logging.debug("<<< {}".format({"key1": key1,
                                    "key2": key2,
                                    "key3": key3,
@@ -53,7 +73,7 @@ def captcha_to_img(base64captcha):
     return imgdata
 
 
-def baidu_oci(config, img_content): # oci, limited
+def baidu_ocr(config, img_content):  # ocr, limited
     client = AipOcr(config['baidu-ocr']['app_id'],
                     config['baidu-ocr']['api_key'],
                     config['baidu-ocr']['secret_key'])
@@ -63,7 +83,7 @@ def baidu_oci(config, img_content): # oci, limited
     else:
         resp = client.basicGeneral(img_content, options)
     if 'error_code' in resp:
-        logging.error('baidu_oci failed: {}'.format(resp))
+        logging.error('baidu_ocr failed: {}'.format(resp))
         if resp['error_code'] in [4, 17, 19]:
             return None, True
         return None, False
@@ -73,5 +93,5 @@ def baidu_oci(config, img_content): # oci, limited
         word = ''.join(list(filter(str.isalnum, word)))
         if len(word) == 4:
             return word, False
-    logging.error('baidu_oci result is bad: {}'.format(resp))
+    logging.error('baidu_ocr result is bad: {}'.format(resp))
     return None, False

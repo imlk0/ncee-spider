@@ -3,6 +3,9 @@ from pymongo import MongoClient
 import resolver
 
 
+connect = None
+nceedb = None
+
 def init():
     global connect
     connect = MongoClient()
@@ -46,8 +49,16 @@ def append_score_result(stuid, content):
     nceedb['scores'].update({'_id': stuid}, {'$push': {'results': {'state': state, 'content': content}}}, upsert=True)
 
 
-def insert_recognized_captcha(base64img, oci):
-    nceedb['captcha'].insert_one({'img': base64img, 'txt': oci})
+def insert_recognized_captcha(base64img, ocr):
+    nceedb['captcha'].insert_one({'img': base64img, 'txt': ocr})
+
+
+def count_recognized_captchas():
+    return nceedb['captcha'].count()
+
+
+def query_recognized_captchas():
+    return list(nceedb['captcha'].find())
 
 
 def query_students_with_scores():

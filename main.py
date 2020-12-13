@@ -2,15 +2,15 @@ import logging
 import argparse
 import os
 import random
+from tqdm import tqdm
+import yaml
 
 import fetch
 import input
 import db
-from tqdm import tqdm
-import yaml
-
 import output
 import resolver
+import model
 
 logging.basicConfig(filename='/tmp/ncee-spider.log',
                     filemode='a',
@@ -33,7 +33,8 @@ parser.add_argument('-s', action="store", dest='query_order', type=int, required
                     help='order to query student. 0: 随机，1: 顺序，2：倒序. default: 0')
 parser.add_argument('-c', action="store", dest='config_file', type=str, required=False,
                     help='config file path, default is ./configuration.yaml')
-
+parser.add_argument('-m', action="store", dest='model_file', type=str, required=False,
+                    help='model file path')
 
 args = parser.parse_args()
 print(args)
@@ -62,6 +63,8 @@ elif args.mode == 's':  # statics
     print("count of bad info students：{}".format(cbs))
     cu = db.count_unfinished_students()
     print("count of unfinished students：{}".format(cu))
+    crc = db.count_recognized_captchas()
+    print("count of recognized captchas：{}".format(crc))
 elif args.mode == 'f':  # fetch
     students = db.query_unfinished_students()
     if args.query_order == 1:
@@ -71,6 +74,12 @@ elif args.mode == 'f':  # fetch
     else:
         args.query_order = 0
         random.shuffle(students)
+    use_offline_model = bool(config['spider']['use_offline_model'])
+    if use_offline_model:
+        if args.model_file is None:
+            print("module path is is required, please use `-m` option to specific it")
+            exit(-1)
+        md = model.load_model(args.model_file)
     for stu in tqdm(students, desc='fetch', position=0):
         for i in tqdm(range(1, config['spider']['max_retry'] + 1), desc='try', position=1, leave=False):
             stu_id, sfzh = stu['考生号'], stu['身份证号']
@@ -78,22 +87,25 @@ elif args.mode == 'f':  # fetch
                 base64img = None
                 while base64img is None:
                     base64img, cookie = fetch.get_captcha()
-                oci, limited = fetch.baidu_oci(
-                    config, fetch.captcha_to_img(base64img))
-                if limited:  # oci request limited
-                    logging.error(
-                        'oci service request limit reached, we will exit!!!')
-                    exit(-1)
-                if oci is not None:
+                if use_offline_model:
+                    ocr = model.img_predect(md)
+                else:
+                    ocr, limited = fetch.baidu_ocr(
+                        config, fetch.captcha_to_img(base64img))
+                    if limited:  # ocr request limited
+                        logging.error(
+                            'ocr service request limit reached, we will exit!!!')
+                        exit(-1)
+                if ocr is not None:
                     break
-            # print([str(stu_id), str(sfzh[-4:]), oci, cookie])
+            # print([str(stu_id), str(sfzh[-4:]), ocr, cookie])
             content = fetch.query_student(
-                str(stu_id), str(sfzh[-4:]), oci, cookie)
+                str(stu_id), str(sfzh[-4:]), ocr, cookie)
             ok = resolver.is_result_ok(content)
             db.append_score_result(stu_id, content=content)
             if ok:
                 logging.debug("fetch score successfully")
-                db.insert_recognized_captcha(base64img, oci)
+                db.insert_recognized_captcha(base64img, ocr)
                 break
             else:
                 logging.debug("fetch score failed, msg is: {}".format(
