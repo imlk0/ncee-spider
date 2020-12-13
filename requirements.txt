@@ -1,0 +1,10 @@
+pymongo==3.10.1
+pandas==1.0.3
+opencv_python==4.2.0.34
+baidu_aip==2.2.18.0
+requests==2.23.0
+numpy==1.18.5
+tqdm==4.45.0
+matplotlib==3.2.1
+lzstring==1.0.4
+PyYAML==5.3.1

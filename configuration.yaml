@@ -1,0 +1,7 @@
+baidu-ocr:
+  accurate: false
+  app_id: 'xxxxx'
+  api_key: 'xxxxxx'
+  secret_key: 'xxxxxx'
+spider:
+  max_retry: 5
